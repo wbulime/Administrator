@@ -8,6 +8,7 @@ NO hardcoded colors, fonts, or spacing allowed
 
 import argparse
 import json
+import os
 from html import escape
 from pathlib import Path
 from datetime import datetime
@@ -634,7 +635,7 @@ SLIDE_GENERATORS = {
 }
 
 
-def generate_deck(slides_data, title="Pitch Deck"):
+def generate_deck(slides_data, title="Pitch Deck", output_dir=None):
     """Generate complete deck from slide data list"""
     slides_html = ""
     for slide in slides_data:
@@ -645,8 +646,9 @@ def generate_deck(slides_data, title="Pitch Deck"):
         else:
             print(f"Warning: Unknown slide type '{slide_type}'")
 
-    # Calculate relative path to tokens CSS
-    tokens_rel_path = "../../../assets/design-tokens.css"
+    # Calculate relative path to tokens CSS from the actual output directory
+    output_dir = Path(output_dir) if output_dir else OUTPUT_DIR
+    tokens_rel_path = os.path.relpath(TOKENS_CSS, start=output_dir).replace(os.sep, '/')
 
     return SLIDE_TEMPLATE.format(
         title=escape(str(title)),
@@ -744,10 +746,9 @@ def main():
             }
         ]
 
-        html = generate_deck(demo_slides, "ClaudeKit Marketing - Pitch Deck")
-
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         output_path = OUTPUT_DIR / f"demo-pitch-{datetime.now().strftime('%y%m%d')}.html"
+        html = generate_deck(demo_slides, "ClaudeKit Marketing - Pitch Deck", output_dir=output_path.parent)
         output_path.write_text(html, encoding='utf-8')
         print(f"Demo deck generated: {output_path}")
 
@@ -755,10 +756,9 @@ def main():
         with open(args.json, 'r') as f:
             data = json.load(f)
 
-        html = generate_deck(data.get('slides', []), data.get('title', 'Presentation'))
-
         output_path = Path(args.output) if args.output else OUTPUT_DIR / f"deck-{datetime.now().strftime('%y%m%d-%H%M')}.html"
         output_path.parent.mkdir(parents=True, exist_ok=True)
+        html = generate_deck(data.get('slides', []), data.get('title', 'Presentation'), output_dir=output_path.parent)
         output_path.write_text(html, encoding='utf-8')
         print(f"Deck generated: {output_path}")
 
