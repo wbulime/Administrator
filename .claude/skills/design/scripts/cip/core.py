@@ -181,6 +181,66 @@ def search_all(query, max_results=2):
     return all_results
 
 
+def _singularize(word):
+    """Naive singularization: strip a trailing 's' (but not 'ss').
+
+    Lets free-text plurals like "cards" line up with a CSV's singular
+    "card" (and vice versa) when matching known deliverable names.
+    """
+    lw = word.lower()
+    if lw.endswith('s') and not lw.endswith('ss') and len(lw) > 3:
+        return lw[:-1]
+    return lw
+
+
+def _known_deliverables():
+    """Map every canonical deliverable name (as a singularized, lowercased
+    word tuple) to its full CSV row.
+
+    Used to resolve free-text "Key Deliverables" phrases directly against
+    deliverables.csv instead of splitting on whitespace and running a
+    fuzzy BM25 search per fragment, which mis-tokenizes multi-word names
+    (e.g. "Business cards" -> "business" + "cards" as separate one-word
+    queries) and can rank unrelated short entries above the intended one.
+    """
+    filepath = DATA_DIR / CSV_CONFIG["deliverable"]["file"]
+    if not filepath.exists():
+        return {}
+    index = {}
+    for row in _load_csv(filepath):
+        words = row.get("Deliverable", "").split()
+        if words:
+            index[tuple(_singularize(w) for w in words)] = row
+    return index
+
+
+def _segment_deliverables(text):
+    """Split free text into (phrase, row) pairs, preferring the longest
+    known deliverable name at each position (resolved directly to its CSV
+    row) and falling back to the raw word for the caller to search."""
+    words = text.split()
+    if not words:
+        return []
+    known = _known_deliverables()
+    max_len = max((len(k) for k in known), default=1)
+    segments = []
+    i = 0
+    while i < len(words):
+        matched = False
+        for size in range(min(max_len, len(words) - i), 0, -1):
+            window = words[i:i + size]
+            key = tuple(_singularize(w) for w in window)
+            if key in known:
+                segments.append((" ".join(window), known[key]))
+                i += size
+                matched = True
+                break
+        if not matched:
+            segments.append((words[i], None))
+            i += 1
+    return segments
+
+
 def get_cip_brief(brand_name, industry_query, style_query=None):
     """Generate a comprehensive CIP brief for a brand"""
     # Search industry
@@ -193,12 +253,16 @@ def get_cip_brief(brand_name, industry_query, style_query=None):
     style = style_results.get("results", [{}])[0] if style_results.get("results") else {}
 
     # Get recommended deliverables for the industry
-    key_deliverables = industry.get("Key Deliverables", "").split()
+    deliverable_output_cols = CSV_CONFIG["deliverable"]["output_cols"]
+    segments = _segment_deliverables(industry.get("Key Deliverables", ""))
     deliverable_results = []
-    for d in key_deliverables[:5]:
-        result = search(d, "deliverable", 1)
-        if result.get("results"):
-            deliverable_results.append(result["results"][0])
+    for phrase, row in segments[:5]:
+        if row is not None:
+            deliverable_results.append({col: row.get(col, "") for col in deliverable_output_cols if col in row})
+        else:
+            result = search(phrase, "deliverable", 1)
+            if result.get("results"):
+                deliverable_results.append(result["results"][0])
 
     return {
         "brand_name": brand_name,
