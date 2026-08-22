@@ -2,22 +2,22 @@
 
   <!-- Icon -->
   <g transform="translate(150,215)">
-    <line x1="20" y1="8" x2="20" y2="212" stroke="#127b73" stroke-width="20" stroke-linecap="round"/>
-    <path d="M20,18
-             L150,18
-             C196,18 218,40 218,78
-             L218,90
-             C266,92 266,138 218,140
-             L218,152
-             C218,190 196,212 150,212
+    <line x1="20" y1="5" x2="20" y2="215" stroke="#127b73" stroke-width="20" stroke-linecap="round"/>
+    <path d="M20,20
+             L150,20
+             A40,40 0 0 1 190,60
+             L190,90
+             A26,26 0 1 1 190,142
+             L190,172
+             A40,40 0 0 1 150,212
              L20,212"
           fill="none" stroke="#127b73" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
-    <line x1="58" y1="34" x2="58" y2="196" stroke="#127b73" stroke-width="8" stroke-dasharray="14,12" stroke-linecap="round"/>
+    <line x1="58" y1="36" x2="58" y2="196" stroke="#127b73" stroke-width="9" stroke-dasharray="4,13" stroke-linecap="round"/>
     <g fill="#f59e0b">
-      <rect x="98" y="80" width="34" height="34" rx="7"/>
-      <rect x="140" y="80" width="34" height="34" rx="7"/>
-      <rect x="98" y="122" width="34" height="34" rx="7"/>
-      <rect x="140" y="122" width="34" height="34" rx="7"/>
+      <rect x="88" y="86" width="34" height="34" rx="8"/>
+      <rect x="130" y="86" width="34" height="34" rx="8"/>
+      <rect x="88" y="128" width="34" height="34" rx="8"/>
+      <rect x="130" y="128" width="34" height="34" rx="8"/>
     </g>
   </g>
 
