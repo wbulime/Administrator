@@ -54,6 +54,61 @@ input:focus-visible {
   color: var(--color-accent);
 }
 
+/* ============ Eyebrow pill (ported from a 21st.dev hero block) ============ */
+.eyebrow-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: 9999px;
+  background: linear-gradient(to top right, rgba(161, 98, 7, 0.12), rgba(161, 98, 7, 0.03));
+  border: 1px solid rgba(28, 25, 23, 0.08);
+  transition: background 250ms ease;
+}
+
+.eyebrow-pill:hover {
+  background: linear-gradient(to top right, rgba(161, 98, 7, 0.2), rgba(161, 98, 7, 0.05));
+}
+
+.eyebrow-pill svg {
+  transition: transform 250ms ease;
+}
+
+.eyebrow-pill:hover svg {
+  transform: translateX(3px);
+}
+
+/* ============ Spinning gradient-border CTA (ported from a 21st.dev hero block) ============ */
+.spin-border {
+  position: relative;
+  display: inline-flex;
+  border-radius: 9999px;
+  padding: 1.5px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.spin-border::before {
+  content: '';
+  position: absolute;
+  inset: -1000%;
+  background: conic-gradient(from 90deg at 50% 50%, var(--color-muted) 0%, var(--color-accent) 50%, var(--color-muted) 100%);
+  animation: spin-border-rotate 2.5s linear infinite;
+  z-index: -1;
+}
+
+@keyframes spin-border-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin-border::before {
+    animation: none;
+  }
+}
+
 /* ============ Underline CTA ============ */
 .cta-underline {
   position: relative;
