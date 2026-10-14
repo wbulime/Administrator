@@ -1,0 +1,13 @@
+{
+  "name": "cocoa-artisan-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static marketing site for Cocoa Artisan, a small-batch bean-to-bar chocolate brand.",
+  "scripts": {
+    "build:css": "tailwindcss -i assets/css/tailwind-input.css -o assets/css/tailwind.css --minify"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}
